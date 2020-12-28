@@ -1,0 +1,2 @@
+/home/user/catkin_ws/src/bariago/CMakeFiles/rebuild_cache.dir
+/home/user/catkin_ws/src/bariago/CMakeFiles/edit_cache.dir

@@ -1,10 +1,9 @@
 #!/usr/bin/env python
  
-import roslib; roslib.load_manifest('json_prolog')
-from msg import Cocktail as cocktail_msg
-from srv import CocktailOrder as order
+import roslib;
+from bariago.msg import Cocktail as cocktail_msg
+from bariago.srv import CocktailOrder as order
 import rospy
-import json_prolog
 
 
 # Give ourselves the ability to run a dynamic reconfigure server.
@@ -13,62 +12,58 @@ from dynamic_reconfigure.server import Server as DynamicReconfigureServer
 def order_response(request):
     ''' 
     Callback function used by the service server to process
-    requests from clients. It returns a TriggerResponse
+    requests from clients. It returns a 
     '''
-    return order(
-        nationality=1,
-        favourite_taste=^
-    )
-
-    
-class MinimalService(Node):
-
-    def __init__(self):
-        super().__init__('minimal_service')
-        self.srv = self.create_service(AddTwoInts, 'add_two_ints', self.add_two_ints_callback)
-
-    def add_two_ints_callback(self, request, response):
-        response.sum = request.a + request.b
-        self.get_logger().info('Incoming request\na: %d b: %d' % (request.a, request.b))
-
-        return response
+    request = order()
+    print('Please answer the following questions:')
+    print('Where are you from? \n Type in:\n 1 for Sweden\n 2 for Germany\n 3 for Scottland\n 4 for Spain\n 5 for China\n 6 for England\n 7 for Mexico\n 8 for USA')
+    n1 = int(input('Enter your nationality: '))
+    print('What is your favourite taste?\n Type in:\n 1 for sweet\n 2 for bitter\n 3 for spicy\n 4 for sour\n 5 for salty')
+    n2 = int(input('Enter your favourite taste: '))
+    request.nationality = n1
+    request.favourite_taste = n2
+    return request
 
 class CocktailOrderInterface():
 # Must have __init__(self) function for a class, similar to a C++ class constructor.
 
-def __init__(self):
-    # Get the ~private namespace parameters from command line or launch file.
-    rate = float(1)
-    topic = '/cocktail'
-    rospy.loginfo('rate = %d', rate)
-    rospy.loginfo('topic = %s', topic)
-    self.enable = True
-    self.msg = cocktail_msg()
-    # add the ros service
-    self.order = order()
-    # create the connection to teh service
-    self.order_service = rospy.ServiceProxy('/order_service', order)
-    self.order = order_service(order_response())
-    # Create a publisher for our custom message.
-    pub = rospy.Publisher(topic, cocktail_msg)
-    # Set the message to publish as our custom message.
-    # Initialize message variables.
-    self.msg.customer_nationality = 1
-    self.msg.favourite_taste = 1
-    self.enable = True
+    def __init__(self):
+        # Get the ~private namespace parameters from command line or launch file.
+        rate = float(1)
+        topic = '/cocktail'
+        rospy.loginfo('rate = %d', rate)
+        rospy.loginfo('topic = %s', topic)
+        self.enable = True
+        self.msg = cocktail_msg()
+        # add the ros service
+        self.order_srv = order()
+        # create the connection to the service
+        rospy.wait_for_service('/cocktail_order')
+        rospy.loginfo('waiting for service done')
+        self.order_service = rospy.ServiceProxy('/cocktail_order', order)
+        order_msg = order()
+        self.order_srv = order_response(order_msg)
+        # Create a publisher for our custom message.
+        self.pub = rospy.Publisher(topic, cocktail_msg, queue_size=10)
+        # Set the message to publish as our custom message.
+        # Initialize message variables.
+        self.msg.customer_nationality = self.order_srv.nationality
+        self.msg.favourite_taste = self.order_srv.favourite_taste
+        self.enable = True
 
-    if self.enable:
-        self.start()
-    else:
-        self.stop()
+        if self.enable:
+            self.start()
+        else:
+            self.stop()
 
-    # Create a timer to go to a callback at a specified interval.
-    rospy.Timer(rospy.Duration(1.0 / rate), self.timer_cb)
+        # Create a timer to go to a callback at a specified interval.
+        rospy.Timer(rospy.Duration(1.0 / rate), self.timer_cb)
 
 
     def start(self):
         """Turn on publisher."""
-        self.pub = rospy.Publisher("example", NodeExampleData, queue_size=10)
+        self.pub.publish(self.msg)
+        rospy.loginfo('current service msg is {}'.format(self.msg))
 
     def stop(self):
         """Turn off publisher."""
@@ -81,24 +76,6 @@ def __init__(self):
         # Publish our custom message.
         self.pub.publish(self.msg)
 
-    def reconfigure_cb(self, config, dummy):
-        """Create a callback function for the dynamic reconfigure server."""
-        # Fill in local variables with values received from dynamic reconfigure
-        # clients (typically the GUI).
-        self.message = config["message"]
-        self.int_a = config["a"]
-        self.int_b = config["b"]
-
-        # Check to see if node should be started or stopped.
-        if self.enable != config["enable"]:
-            if config["enable"]:
-                self.start()
-            else:
-                self.stop()
-        self.enable = config["enable"]
-
-        # Return the new variables.
-        return config
 
 # Main function.
 if __name__ == "__main__":

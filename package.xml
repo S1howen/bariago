@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<package>
+  <name>bariago</name>
+  <version>1.0.0</version>
+  <description>
+    
+    Test
+    
+  </description>
+  <license>GPLv2+</license>
+  <maintainer email="email@domain.com">Maintainer</maintainer>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <run_depend>roslib</run_depend>
+  <build_depend>rosprolog</build_depend>
+  <run_depend>rosprolog</run_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>std_msgs</run_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <build_depend>msg</build_depend>
+  <build_depend>srv</build_depend>
+
+  <build_depend>message_generation</build_depend>
+  <run_depend>message_runtime</run_depend>
+</package>
