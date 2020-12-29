@@ -7,7 +7,14 @@ import rospy
 
 # Give ourselves the ability to run a dynamic reconfigure server.
 from dynamic_reconfigure.server import Server as DynamicReconfigureServer
- 
+ """
+OPEN TO DO LIST:
+
+- fix the order count to get the right valuee very time
+- solve the problem for getting multiple customer orders -> is service the right way?
+- 
+
+ """
 def order_response(request):
     ''' 
     Callback function used by the service server to process
@@ -17,9 +24,16 @@ def order_response(request):
     print('Please answer the following questions:')
     print('Where are you from? \n Type in:\n 1 for Sweden\n 2 for Germany\n 3 for Scottland\n 4 for Spain\n 5 for China\n 6 for England\n 7 for Mexico\n 8 for USA\n 9 for country not listed')
     n1 = int(input('Enter your nationality: '))
+    while n1 > 9:
+        print('Answer not accepted. Please enter a valid number!')
+        n1 = int(input('Enter your nationality: '))
+
     print('What is your favourite taste?\n Type in:\n 1 for sweet\n 2 for bitter\n 3 for spicy\n 4 for sour\n 5 for salty')
     n2 = int(input('Enter your favourite taste: '))
-    
+    while n2 > 5:
+        print('Answer not accepted. Please enter a valid number!')
+        n2 = int(input('Enter your favourite taste: '))
+        
     request.nationality = n1
     request.favourite_taste = n2
     return request
@@ -35,6 +49,7 @@ class CocktailOrderInterface():
         rospy.loginfo('topic = %s', topic)
         self.enable = True
         self.msg = cocktail_msg()
+        self.order_count = 0
         # add the ros service
         self.order_srv = order()
         # create the connection to the service
@@ -63,6 +78,7 @@ class CocktailOrderInterface():
         self.order_srv = order_response(order_msg)
         self.msg.customer_nationality = self.order_srv.nationality
         self.msg.favourite_taste = self.order_srv.favourite_taste
+        self.msg.order_count = self.order_count +1
         self.pub.publish(self.msg)
         rospy.loginfo('current service msg is {}'.format(self.msg))
 
