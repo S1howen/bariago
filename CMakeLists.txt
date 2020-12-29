@@ -4,7 +4,7 @@ project(bariago)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS rospy message_generation)
+find_package(catkin REQUIRED COMPONENTS rospy roslib message_generation)
 
 
 add_message_files(FILES
@@ -20,5 +20,5 @@ generate_messages(
 )
 
 catkin_package(
-  CATKIN_DEPENDS message_runtime rospy
+  CATKIN_DEPENDS message_runtime rospy roslib
 )
