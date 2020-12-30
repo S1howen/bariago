@@ -1,2 +1,4 @@
 int32 nationality
 int32 favourite_taste
+bool likes_hard_alcohol
+int32 current_mood

@@ -1,3 +1,5 @@
 int32 customer_nationality
 int32 favourite_taste
 int32 customer_number
+bool likes_hard_alcohol
+int32 current_mood
