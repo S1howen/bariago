@@ -23,7 +23,12 @@ def order_response(request):
     requests from clients. It returns a 
     '''
     request = order()
-    print('Please answer the following questions:')
+    print('Welcome, I am Bariago.\n How can I help you?\n I see you are thirsty. What dou you want to order?')
+    print('Currently we offer the following drinks:')
+    print('Beer, Sangria, Cocktails: GinTonic, WhiskyCola, CubaLibre,\nShots: Baijiu, Whisky, Gin, Rum,\nSurpriseMe')
+    n_order = str(raw_input('Please enter your order: '))
+    print('Of course. Drink will be ready in no time!')
+    print('I see you are new at this place.')
     print('Where are you from? \n Type in:\n 1 for Sweden\n 2 for Germany\n 3 for Scottland\n 4 for Spain\n 5 for China\n 6 for England\n 7 for Mexico\n 8 for USA\n 9 for country not listed')
     n1 = int(input('Enter your nationality: '))
     while n1 > 9 and n1 < 1:
@@ -36,7 +41,7 @@ def order_response(request):
         print('Answer not accepted. Please enter a valid number!')
         n2 = int(input('Enter your favourite taste: '))
 
-    print('What are you up to? \n Type in:\n 1 for Lets Party!\n 2 drink and chill\n 3 On a date\n 4 for ????\n 5  for mood not listed')
+    print('What are you up to? \n Type in:\n 1 for Lets Party!\n 2 drink and chill\n 3 On a date\n 4 for Sad\n 5  for mood not listed')
     n3 = int(input('What are you up to: '))
     while n3 > 5 and n1 < 1:
         print('Answer not accepted. Please enter a valid number!')
@@ -51,6 +56,7 @@ def order_response(request):
         n4 =str(raw_input('Do you like hard alcohol? '))
 
     print('answer accepted!')    
+    request.cocktail_request = n_order
     request.nationality = n1
     request.favourite_taste = n2
     if n4 == 'y' or n4 == 'Y':
@@ -91,7 +97,6 @@ class CocktailOrderInterface():
         self.timer = rospy.Timer(rospy.Duration(1), self.timer_cb)
         print("timer called")
 
-
     def start(self):
         """Turn on publisher."""
         rospy.wait_for_service('/cocktail_order')
@@ -103,6 +108,7 @@ class CocktailOrderInterface():
         self.msg.customer_number = self.order_count +1
         self.msg.likes_hard_alcohol = self.order_srv.likes_hard_alcohol
         self.msg.current_mood = self.order_srv.current_mood
+        self.msg.cocktail_request = self.order_srv.cocktail_request
         self.pub.publish(self.msg)
         rospy.loginfo('current service msg is {}'.format(self.msg))
 

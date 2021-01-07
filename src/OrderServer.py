@@ -1,6 +1,6 @@
 #!/usr/bin/env python
  
-import roslib; 
+import roslib
 from bariago.srv import CocktailOrder as order
 import rospy
 

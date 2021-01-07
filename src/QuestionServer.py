@@ -10,20 +10,21 @@ def customer_response(request):
     """
     valid_answers = ['y', 'Y', 'n', 'N']
     customer_eval = evaluation_msg()
+    customer_eval.recommended_drink = request.recommended_drink
     print('The bartender recommends a ' + request.recommended_drink + '.\n Do you like that drink?')
     n1 = str(raw_input('For yes enter y for no enter n: '))
     
     while n1 not in valid_answers:
-        print('Sorry. Answer not accepted! Please type in something valid!')
+        print('Sorry:( Answer not accepted! Please type in something valid!')
         n1 = str(raw_input('For yes enter y for no enter n: '))
 
     if n1 == 'y' or n1 == 'Y':
         print('Great. Your drink will be served in no time.')
-        request.customer_opinion = True
+        customer_eval.customer_opinion = True
     elif n1 == 'n' or n1 == 'N':
         print('Okay let me think of something fitting for you!')
-        request.customer_opinion = False
-    return request
+        customer_eval.customer_opinion = False
+    return customer_eval
 
 rospy.init_node('QuestionServer')                     # initialize a ROS node
 my_service = rospy.Service(                        # create a service, specifying its name,

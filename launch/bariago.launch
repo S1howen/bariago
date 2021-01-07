@@ -3,5 +3,4 @@
 <node pkg='bariago' type="InterFaceNode.py" name="InterFaceNode" output="screen"/>
 <node pkg='bariago' type="PlanningNode.py" name="PlanningNode" output="screen"/>
 <node pkg="bariago" type="QuestionServer.py" name="QuestionServer" output="screen"/>
-<node name="rosprolog" pkg="rosprolog" type="rosprolog_node" output="screen"/>
 </launch>
