@@ -22,11 +22,46 @@ def order_response(request):
     Callback function used by the service server to process
     requests from clients. It returns a 
     '''
+    cocktail_d = {}
+    cocktail_d['GinTonic'] = 'GinTonic'
+    cocktail_d['Gin Tonic'] = 'GinTonic'
+    cocktail_d['Gintonic'] = 'GinTonic'
+    cocktail_d['gintonic'] = 'GinTonic'
+    cocktail_d['CubaLibre'] = 'CubaLibre'
+    cocktail_d['cuba libre'] = 'CubaLibre'
+    cocktail_d['Cubalibre'] = 'CubaLibre'
+    cocktail_d['Cuba Libre'] = 'CubaLibre'
+    cocktail_d['WhiskyCola'] = 'WhiskyCola'
+    cocktail_d['whiskyCola'] = 'WhiskyCola'
+    cocktail_d['Whisky Cola'] = 'WhiskyCola'
+    cocktail_d['Beer'] = 'Beer'
+    cocktail_d['beer'] = 'Beer'
+    cocktail_d['Wine'] = 'Wine'
+    cocktail_d['wine'] = 'Wine'
+    cocktail_d['Sangria'] = 'Sangria'
+    cocktail_d['sangria'] = 'Sangria'
+    cocktail_d['Baijiu'] = 'Baijiu'
+    cocktail_d['baijiu'] = 'Baijiu'
+    cocktail_d['Whisky'] = 'Whisky'
+    cocktail_d['whisky'] = 'Whisky'
+    cocktail_d['Gin'] = 'Gin'
+    cocktail_d['gin'] = 'Gin'
+    cocktail_d['Rum'] = 'Rum'
+    cocktail_d['rum'] = 'Rum'
+    cocktail_d['SurpriseMe'] = 'SurpriseMe'
+    cocktail_d['SurpriseMe!'] = 'SurpriseMe'
+    cocktail_d['Surprise Me'] = 'SurpriseMe'
+    cocktail_d['surprise me'] = 'SurpriseMe'
+    cocktail_d['Surprise me'] = 'SurpriseMe'
+
     request = order()
     print('Welcome, I am Bariago.\n How can I help you?\n I see you are thirsty. What dou you want to order?')
     print('Currently we offer the following drinks:')
-    print('Beer, Sangria, Cocktails: GinTonic, WhiskyCola, CubaLibre,\nShots: Baijiu, Whisky, Gin, Rum,\nSurpriseMe')
+    print('Beer, Wine, Sangria,\nCocktails: GinTonic, WhiskyCola, CubaLibre,\nShots: Baijiu, Whisky, Gin, Rum,\nSurpriseMe')
     n_order = str(raw_input('Please enter your order: '))
+    while n_order not in cocktail_d:
+        n_order = str(raw_input('There seems to be a mistake:(\nRepeat your order please: '))
+    
     print('Of course. Drink will be ready in no time!')
     print('I see you are new at this place.')
     print('Where are you from? \n Type in:\n 1 for Sweden\n 2 for Germany\n 3 for Scottland\n 4 for Spain\n 5 for China\n 6 for England\n 7 for Mexico\n 8 for USA\n 9 for country not listed')
@@ -55,8 +90,9 @@ def order_response(request):
         print('Answer not accepted. Please enter a valid answer!')
         n4 =str(raw_input('Do you like hard alcohol? '))
 
-    print('answer accepted!')    
-    request.cocktail_request = n_order
+    print('answer accepted!')  
+    cocktail_order = cocktail_d[n_order]  
+    request.cocktail_request = cocktail_order
     request.nationality = n1
     request.favourite_taste = n2
     if n4 == 'y' or n4 == 'Y':
