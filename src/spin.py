@@ -88,6 +88,7 @@ def main():
     app = ForeverSpin(10)
     app.run()
 
+
 if __name__ == '__main__':
     try:
         main()
