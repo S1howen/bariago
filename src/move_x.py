@@ -8,8 +8,9 @@
 #   * Siegfried-A. Gevatter
 
 import math
-
+import sys
 import rospy
+import time
 from geometry_msgs.msg import Twist
 
 
@@ -42,34 +43,146 @@ class Velocity(object):
 class Move_from_x_to_y():
     def __init__(self, asked_movement):
         self._pub_cmd = rospy.Publisher('key_vel', Twist)
-        self._hz = rospy.get_param('~hz', 10)
+        self._hz = rospy.get_param('~hz', 100)
         self.rotation_rate = 0
+        self.moveTime = 0
+        self.start_serv = 2
+        #self.nitu_gradur = 5.7
         if asked_movement == "right":
-            self.moveTime = 5.3
-            self._forward_rate = rospy.get_param('~forward_rate', 0.0)
-            self._rotation_rate = rospy.get_param('~rotation_rate', 0.3)
+            self.right()
         elif asked_movement == "left":
-            self.moveTime = 5.3
-            self._forward_rate = rospy.get_param('~forward_rate', 0.0)
-            self._rotation_rate = rospy.get_param('~rotation_rate', 0.3)
+            self.left()
+        elif asked_movement == "straight":
+            self.straight(1)
         elif asked_movement == "start_rum":
-            self.steps = 1
-            self._forward_rate = rospy.get_param('~forward_rate', 0.3)
-            self._rotation_rate = rospy.get_param('~rotation_rate', 0.0)
-            self.moveTime = 1.6666*self.steps
+            self.left()
+            time.sleep(1)
+            self.straight(1)
+            time.sleep(1)
+            self.right()
         elif asked_movement == "rum_cola":
-            self.steps = 2
-            self._forward_rate = rospy.get_param('~forward_rate', 0.3)
-            self._rotation_rate = rospy.get_param('~rotation_rate', 0.0)
-            self.moveTime = 1.6666*self.steps
-        self.runtime = moveTime * self._hz
-
+            self.left()
+            time.sleep(1)
+            self.straight(2)
+            time.sleep(1)
+            self.right()
+        elif asked_movement == "cola_serv":
+            self.right()
+            time.sleep(1)
+            self.straight(3)
+            time.sleep(1)
+            self.right()
+            self.straight(self.start_serv)
+        elif asked_movement == "serv_start":
+            self.right()
+            time.sleep(1)
+            self.right()
+            time.sleep(1)
+            self.straight(self.start_serv)
+        elif asked_movement == "start_wis":
+            self.left()
+            time.sleep(1)
+            self.straight(2)
+            time.sleep(1)
+            self.right()
+        elif asked_movement == "wis_cola":
+            self.left()
+            time.sleep(1)
+            self.straight(1)
+            time.sleep(1)
+            self.right()
+        elif asked_movement == "start_gin":
+            self.left()
+            time.sleep(1)
+            self.straight(4)
+            time.sleep(1)
+            self.right()
+        elif asked_movement == "gin_tonic":
+            self.left()
+            time.sleep(1)
+            self.straight(1)
+            time.sleep(1)
+            self.right()                   
+        elif asked_movement == "tonic_serv":
+            self.right()
+            time.sleep(1)
+            self.straight(5)
+            time.sleep(1)
+            self.right()
+            self.straight(self.start_serv)
+        elif asked_movement == "start_beer":
+            self.left()
+            time.sleep(1)
+            self.straight(6)
+            time.sleep(1)
+            self.right()
+        elif asked_movement == "beer_serv":
+            self.right()
+            time.sleep(1)
+            self.straight(6)
+            time.sleep(1)
+            self.right()
+            self.straight(self.start_serv)
+        elif asked_movement == "start_wine":
+            self.left()
+            time.sleep(1)
+            self.straight(7)
+            time.sleep(1)
+            self.right()        
+        elif asked_movement == "wine_serv":
+            self.right()
+            time.sleep(1)
+            self.straight(7)
+            time.sleep(1)
+            self.right()
+            time.sleep(1)
+            self.straight(self.start_serv)
+        elif asked_movement == "wis_lime":
+            self.left()
+            time.sleep(1)
+            self.straight(7)
+            time.sleep(1)
+            self.right()
+        elif asked_movement == "lime_serv":
+            self.right()
+            time.sleep(1)
+            self.straight(9)
+            time.sleep(1)
+            self.right()
+            self.straight(self.start_serv)  
         #self._backward_rate = rospy.get_param('~backward_rate', 0.3)
-        self._angular = 0
-        self._linear = 0
+    def right(self):
+        self.moveTime = 5.4
+        self._forward_rate = rospy.get_param('~forward_rate', 0.0)
+        self._rotation_rate = rospy.get_param('~rotation_rate', -0.3)
+        self.runtime = self.moveTime * self._hz
+        self.run()
 
+    def left(self):
+        self.moveTime = 5.44
+        self._forward_rate = rospy.get_param('~forward_rate', 0.0)
+        self._rotation_rate = rospy.get_param('~rotation_rate', 0.3)
+        self.runtime = self.moveTime * self._hz
+        self.run()
+
+    def straight(self, num_of_squers):
+        self.steps = num_of_squers
+        self._forward_rate = rospy.get_param('~forward_rate', 0.1)
+        self._rotation_rate = rospy.get_param('~rotation_rate', 0.0)
+        self.moveTime = 5*self.steps
+        self.runtime = self.moveTime * self._hz
+        self.run()
+    
+    def start_serv(self):
+        self._forward_rate= rospy.get_param("~forward_rate", 0.1)
+        self._rotation_rate = rospy.get_param('~rotation_rate', 0.0)
+        self.movetime = 40
+        self.runtime = self.moveTime * self._hz   
+        self.run() 
 
     def run(self):
+        self._angular = 0
+        self._linear = 0
         rate = rospy.Rate(self._hz)
         runtime = self.runtime
         while runtime > 0:
@@ -103,8 +216,8 @@ class Move_from_x_to_y():
 def main():
     asked_movement = sys.argv
     rospy.init_node('spin')
-    app = Move_from_x_to_y(asked_movement)
-    app.run()
+    app = Move_from_x_to_y(asked_movement[1])
+
 
 
 if __name__ == '__main__':
