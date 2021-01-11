@@ -52,52 +52,7 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(bariago_pick src/bariago_pick.cpp)
-target_link_libraries(bariago_pick ${catkin_LIBRARIES})
 
-
-### INSTALL ###
-
-install(TARGETS bariago_pick
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-add_executable(up src/up.cpp)
-target_link_libraries(up ${catkin_LIBRARIES})
-
-
-### INSTALL ###
-
-install(TARGETS up
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-add_executable(serv src/serv.cpp)
-target_link_libraries(serv ${catkin_LIBRARIES})
-
-
-### INSTALL ###
-
-install(TARGETS serv
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-add_executable(down src/down.cpp)
-target_link_libraries(down ${catkin_LIBRARIES})
-
-### INSTALL ###
-
-install(TARGETS down
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
 
 
 install(PROGRAMS spin.py

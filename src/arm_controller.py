@@ -292,9 +292,6 @@ class Velocity(object):
         max_value = self._min + self._step_incr * (step - 1)
         return value * max_value
 
-def cobalibre
-    Move_from_x_to_y()
-    arm.start_trajectory()
 
 if __name__ == '__main__':
     rospy.init_node("single_arm_controller")

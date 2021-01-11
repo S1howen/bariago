@@ -9,6 +9,7 @@ import math
 import sys
 import time
 from geometry_msgs.msg import Twist
+from bariago.msg import 
 
 
 ARM_JOINTS= ["arm_1_joint", "arm_2_joint", "arm_3_joint","arm_4_joint", "arm_5_joint", "arm_6_joint", "arm_7_joint"]
@@ -326,16 +327,16 @@ class Movement_manager:
         self.cocktail_dict["Beer"] = ["arm_init",'base_table',"arm_up","base_start_beer","arm_down_up","base_beer_serv","arm_serv"]
         self.cocktail_dict["Wine"] = ["arm_init",'base_table',"arm_up","base_start_wine","arm_down_up","base_wine_serv","arm_serv"]
         self.function_mapping = {"arm_init": arm_init(), "arm_down": arm_down(), "arm_serv": arm_serv(), "arm_up": arm_up(), "arm_down_up": arm_down_up()}
-        topic_subscriber = "/topic_name"
+        self.topic_subscriber = '/prep_order'
         rate = float(1) # needed for a callback loop how often in a second the callback will be called
 
-	# create a subscriber
-	#self.subscriber = rospy.Subscriber("/prep_order", messagevariable, subscriber_callback_function)
+	    # create a subscriber
+	    #self.subscriber = rospy.Subscriber("/prep_order", messagevariable, subscriber_callback_function)
 	
-	# create a publisher
-        self.pub = rospy.Publisher(topic_name, message_type, queue_size=1)
+	    # create a publisher
+        self.pub = rospy.Publisher(self.topic_subscriber, message_type, queue_size=1)
 	
-	# define a timer for a timer callback
+	    # define a timer for a timer callback
         self.timer = rospy.Timer(rospy.Duration(1), self.timer_cb)
 
     def subscriber_callback_function(self, messagevariable):
