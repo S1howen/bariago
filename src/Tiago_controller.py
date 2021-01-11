@@ -341,12 +341,16 @@ class Movement_manager:
     def subscriber_callback_function(self, messagevariable):
 	    # thsi gets called every time a message arrives use the messgae to store the stuff in your variables and calciclate somethjing
         cocktail_name = messge.cocktail_name
-        list_with_movements =  self.cocktail_dict[cocktail_name]
+        list_with_movements = self.cocktail_dict[cocktail_name]
         for movement in list_with_movements:
-            if 'arm' in movement:
-                self.arm.start_trajectory(movement[4:])
+            if "arm" in movement:
+                rospy.loginfo(movement)
+                self.arm.start_trajectory(self.function_mapping[movement])
+                time.sleep(2)
             elif 'base' in movement:
+                rospy.loginfo(movement)
                 self.app = Move_from_x_to_y(movement[5:])
+                time.sleep(2)
         print('Here is your drink. Enjoy!')
 
 	
@@ -380,9 +384,9 @@ if __name__ == "__main__":
     rospy.init_node("Tiago_mover")
     # Go to class functions that do all the heavy lifting.
     try:
-        #Movement_manager()
-        Movement_manager().test_function()
-        #rospy.spin()
+        Movement_manager()
+        #Movement_manager().test_function()
+        rospy.spin()
 
     except rospy.ROSInterruptException:
         pass
