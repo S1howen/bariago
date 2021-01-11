@@ -15,8 +15,8 @@ OPEN TO DO LIST:
 - fix the order count to get the right valuee very time
 - solve the problem for getting multiple customer orders -> is service the right way?
 - 
-
 """
+
 def order_response(request):
     ''' 
     Callback function used by the service server to process
