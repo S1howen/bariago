@@ -14,9 +14,14 @@ roslaunch knowrob_tutorial.launch
 ```
 cd catkin_ws/
 source devel/setup.bash
+roslaunch bariago bar_env.launch
+```
+3. Open a third terminal
+```
+cd catkin_ws/
+source devel/setup.bash
 roslaunch bariago bariago.launch
 ```
-
 3. Listen to the text in the terminal and create a order and your cocktail will be served in no time!:)
 
 4. If you want to start a new order type in the second terminal:
