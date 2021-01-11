@@ -1,44 +1,17 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
-#
-# Copyright (c) 2013 PAL Robotics SL.
-# Released under the BSD License.
-#
-# Authors:
-#   * Siegfried-A. Gevatter
+import rospy
+from trajectory_msgs.msg import JointTrajectory,JointTrajectoryPoint
+from control_msgs.msg import FollowJointTrajectoryGoal, FollowJointTrajectoryAction
+from actionlib import SimpleActionClient, SimpleGoalState
+import trajectory_msgs.msg
 
 import math
 import sys
-import rospy
 import time
 from geometry_msgs.msg import Twist
 
 
-class Velocity(object):
-
-    def __init__(self, min_velocity, max_velocity, num_steps):
-        assert min_velocity > 0 and max_velocity > 0 and num_steps > 0
-        self._min = min_velocity
-        self._max = max_velocity
-        self._num_steps = num_steps
-        if self._num_steps > 1:
-            self._step_incr = (max_velocity - min_velocity) / (self._num_steps - 1)
-        else:
-            # If num_steps is one, we always use the minimum velocity.
-            self._step_incr = 0
-
-    def __call__(self, value, step):
-        """
-        Takes a value in the range [0, 1] and the step and returns the
-        velocity (usually m/s or rad/s).
-        """
-        if step == 0:
-            return 0
-
-        assert step > 0 and step <= self._num_steps
-        max_value = self._min + self._step_incr * (step - 1)
-        return value * max_value
-
+ARM_JOINTS= ["arm_1_joint", "arm_2_joint", "arm_3_joint","arm_4_joint", "arm_5_joint", "arm_6_joint", "arm_7_joint"]
 
 class Move_from_x_to_y():
     def __init__(self, asked_movement):
@@ -215,17 +188,119 @@ class Move_from_x_to_y():
     def _publish(self):
         twist = self._get_twist(self._linear, self._angular)
         self._pub_cmd.publish(twist)
+def arm_init():
+    trajectory = JointTrajectory()
+    trajectory.joint_names = ARM_JOINTS
+
+    point = JointTrajectoryPoint()
+    point.positions = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    point.velocities = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    point.time_from_start = rospy.Duration(3.0)
+    trajectory.points.append(point)
 
 
-def main():
-    asked_movement = sys.argv
-    rospy.init_node('spin')
-    app = Move_from_x_to_y(asked_movement[1])
+    point = JointTrajectoryPoint()
+    point.positions = [0.25, -0.38,-1.5,1.49,0.0,0.2,-0.35]
+    point.velocities = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    point.time_from_start = rospy.Duration(6.0)
+    trajectory.points.append(point)
 
+    return trajectory
 
+def arm_up():
+    trajectory = JointTrajectory()
+    trajectory.joint_names = ARM_JOINTS
+
+    point = JointTrajectoryPoint()
+    point.positions = [0.25,-0.2,-2.2,1.49,0.0,-0.6,-0.3]
+    point.velocities = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    point.time_from_start = rospy.Duration(3.0)
+    trajectory.points.append(point)
+    return trajectory
+
+def arm_down():
+    trajectory = JointTrajectory()
+    trajectory.joint_names = ARM_JOINTS
+
+    point = JointTrajectoryPoint()
+    point.positions = [0.25,-0.3,-1.7,1.49,0.0,0.0,-0.35]
+    point.velocities = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    point.time_from_start = rospy.Duration(3.0)
+    trajectory.points.append(point)
+    return trajectory
+
+def arm_serv():
+    trajectory = JointTrajectory()
+    trajectory.joint_names = ARM_JOINTS
+
+    point = JointTrajectoryPoint()
+    point.positions = [0.25,-0.38,-1.5,1.49,0.0,0.2,-0.35]
+    point.velocities = [0.0,0.0,0.0,0.0,0.0,0.0,0.0]
+    point.time_from_start = rospy.Duration(3.0)
+    trajectory.points.append(point)
+    return trajectory
+ 
+class ArmController:
+    def __init__(self):
+        arm = "arm"
+        self.client = SimpleActionClient("/arm_controller/follow_joint_trajectory", FollowJointTrajectoryAction)
+        #wait for the action servers to come up 
+        iteration = 0
+        max_iter = 3
+        while not self.client.wait_for_server(rospy.Duration(2.0)) and max_iter> iteration:
+            iteration += 1
+
+    def start_trajectory(self, trajectory, set_time_stamp=True, wait=True):
+        """Creates an action from the trajectory and sends it to the server"""
+        goal = FollowJointTrajectoryGoal()
+        goal.trajectory = trajectory
+        if set_time_stamp:
+            goal.trajectory.header.stamp = rospy.Time.now()      
+        self.client.send_goal(goal)
+
+        if wait:
+            self.wait()
+ 
+    def wait(self):
+        self.client.wait_for_result()
+
+    def is_done(self):
+        return self.client.get_state() > SimpleGoalState.ACTIVE
+
+class Velocity(object):
+
+    def __init__(self, min_velocity, max_velocity, num_steps):
+        assert min_velocity > 0 and max_velocity > 0 and num_steps > 0
+        self._min = min_velocity
+        self._max = max_velocity
+        self._num_steps = num_steps
+        if self._num_steps > 1:
+            self._step_incr = (max_velocity - min_velocity) / (self._num_steps - 1)
+        else:
+            # If num_steps is one, we always use the minimum velocity.
+            self._step_incr = 0
+
+    def __call__(self, value, step):
+        """
+        Takes a value in the range [0, 1] and the step and returns the
+        velocity (usually m/s or rad/s).
+        """
+        if step == 0:
+            return 0
+
+        assert step > 0 and step <= self._num_steps
+        max_value = self._min + self._step_incr * (step - 1)
+        return value * max_value
+
+def cobalibre
+    Move_from_x_to_y()
+    arm.start_trajectory()
 
 if __name__ == '__main__':
-    try:
-        main()
-    except rospy.ROSInterruptException:
-        pass
+    rospy.init_node("single_arm_controller")
+    arm = ArmController()
+    rospy.loginfo("Loaded arm controller")
+    app = Move_from_x_to_y(asked_movement[1])
+    arm.start_trajectory(arm_init())
+
+
