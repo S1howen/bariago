@@ -1,6 +1,6 @@
 #!/usr/bin/env python
- 
-import roslib;
+import time
+import roslib
 from bariago.msg import Cocktail as cocktail_msg
 from bariago.srv import CocktailOrder as order
 from bariago.srv import DrinkEvaluation as evaluation_msg
@@ -31,14 +31,14 @@ def order_response(request):
     cocktail_d['cuba libre'] = 'CubaLibre'
     cocktail_d['Cubalibre'] = 'CubaLibre'
     cocktail_d['Cuba Libre'] = 'CubaLibre'
-    cocktail_d['WhiskyCola'] = 'WhiskyCola'
+    cocktail_d['WhiskeyCola'] = 'WhiskeyCola'
     cocktail_d['whiskeyCola'] = 'WhiskeyCola'
     cocktail_d['Whiskey Cola'] = 'WhiskeyCola'
     cocktail_d['whiskey cola'] = 'WhiskeyCola'
-    cocktail_d['WhiskySour'] = 'WhiskyCola'
-    cocktail_d['whiskeysour'] = 'WhiskeyCola'
-    cocktail_d['Whiskey Sour'] = 'WhiskeyCola'
-    cocktail_d['whiskey sour'] = 'WhiskeyCola'
+    cocktail_d['WhiskeySour'] = 'WhiskeySour'
+    cocktail_d['whiskeysour'] = 'WhiskeySour'
+    cocktail_d['Whiskey Sour'] = 'WhiskeySour'
+    cocktail_d['whiskey sour'] = 'WhiskeySour'
     cocktail_d['Beer'] = 'Beer'
     cocktail_d['beer'] = 'Beer'
     cocktail_d['Wine'] = 'Wine'
@@ -50,9 +50,9 @@ def order_response(request):
     cocktail_d['Surprise me'] = 'SurpriseMe'
 
     request = order()
-    print('Welcome, I am Bariago.\n How can I help you?\n I see you are thirsty. What dou you want to order?')
+    print('Welcome, I am Bariago.\nHow can I help you? I see you are thirsty. What dou you want to order?')
     print('Currently we offer the following drinks:')
-    print('Beer, Wine, \nCocktails: GinTonic, WhiskeyCola, CubaLibre, WhiskeySour\n If you want to get a recommendation from the barkeeper based on your preferences type: SurpriseMe')
+    print('Beer, Wine and the Cocktails: GinTonic, WhiskeyCola, CubaLibre, WhiskeySour\n If you want to get a recommendation from the barkeeper based on your preferences type: SurpriseMe')
     n_order = str(raw_input('Please enter your order: '))
     while n_order not in cocktail_d:
         n_order = str(raw_input('There seems to be a mistake:(\nRepeat your order please: '))
@@ -117,37 +117,47 @@ class CocktailOrderInterface():
         # Create a publisher for our custom message.
         self.pub = rospy.Publisher(topic, cocktail_msg, queue_size=10)
         # Set the message to publish as our custom message.
+        if self.order_count == 0:
+            time.sleep(3)
         self.get_new_order()
         self.timer = rospy.Timer(rospy.Duration(1), self.timer_cb)
         print('If you want to start a new order please type in NewOrder')
-        self.start_new_order()
+        self.continue_1 = True
+        self.run_node()
 
+    def run_node(self):
+        
+        while self.continue_1:
+            self.start_new_order()
 
     def stop(self):
         """Turn off publisher."""
         self.pub.unregister()
 
     def timer_cb(self, _event):
-        """Call at a specified interval to publish message."""
+
         # Publish our custom message.
         self.pub.publish(self.msg)
         # print('timer cb going')
-        self.start_new_order()
+        # self.start_new_order()
 
     def get_new_order(self):
+        self.order_count  = self.order_count+ 1
+        if self.order_count == 0:
+            time.sleep(3)
         rospy.wait_for_service('/cocktail_order')
         rospy.loginfo('waiting for service done')
         order_msg = order()
         self.order_srv = order_response(order_msg)
         self.msg.customer_nationality = self.order_srv.nationality
         self.msg.favourite_taste = self.order_srv.favourite_taste
-        self.msg.customer_number = self.order_count + 1
+        self.msg.customer_number = self.order_count 
         self.msg.likes_hard_alcohol = self.order_srv.likes_hard_alcohol
         self.msg.current_mood = self.order_srv.current_mood
         self.msg.cocktail_request = self.order_srv.cocktail_request
         # publish the new order
         # Update the customer_number
-        self.order_count  =+ 1
+        
 
     def start_new_order(self):
         dict_order = {}
@@ -157,8 +167,16 @@ class CocktailOrderInterface():
         dict_order['new order'] = 'NewOrder'
         dict_order['neworder'] = 'NewOrder'
         n1 = str(raw_input())
-        while n1 not in dict_order:
-            n1 =  str(raw_input('Sorry, there seem to be a spelling mistake:( Please Type in NewOrder if you want to start a new order:'))
+
+        while True:
+            try:
+                n1 = str(raw_input('Please Type in NewOrder if you want to start a new order:'))
+                if n1 in dict_order:
+                    break
+                print("Invalid Input entered")
+            except Exception as e:
+                print(e)
+
         start_new_order = dict_order[n1]
         if start_new_order == 'NewOrder':
             self.get_new_order()

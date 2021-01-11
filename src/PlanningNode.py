@@ -57,6 +57,7 @@ class CustomerAccount:
         self.d_taste = {}
         self.d_nationality = {}
         self.d_mood = {}
+        self.speech_dict = {}
         self.init_dicts()
         self.need_recommendation = False
         self.owl_name = "'http://www.chalmers.se/ontologies/ssy235Ontology.owl#"
@@ -80,7 +81,11 @@ class CustomerAccount:
         self.d_mood['3'] = 'OnDate'
         self.d_mood['4'] = 'Sad'
         self.d_mood['5'] = 'Else'
-    
+        self.speech_dict['LetsParty!'] = 'So you want to party tonight. Enjoy it, but remember dont drink and drive!'
+        self.speech_dict['DrinkAndChill'] = 'Nothinb beats a relaxing night in a good bar with a nice drink.'
+        self.speech_dict['OnDate'] = 'So good luck with your date! I bet he or she will like you!'
+        self.speech_dict['Sad'] = 'Hey my friend, life sometimes sucks. There will be better days. Please note, that too much alcohol will not be a solution.'
+        self.speech_dict['Else'] = 'No matter you mood, a coktail is always a good choice!' 
 
     def get_msg_values(self, cocktail_msg):
         """
@@ -111,9 +116,10 @@ class CustomerAccount:
         self.queries_list.append(self.nationality_query)
         self.queries_list.append(self.mood_query)
         self.queries_list.append(self.likes_alc_query)
-        print('The order of our new customer was registered. I see you are from {}. Interesting! I hope you enjoy the stay at our bar.'.format(self.nationality))
+        print('The order of the new customer was registered.\nI see you are {}, interesting! I hope you enjoy the stay at our bar.'.format(self.nationality))
+        text = self.speech_dict[self.current_mood]
+        print(text)
         
-
     def create_customer_drink_queries(self):
         
         query_list = []
@@ -170,7 +176,6 @@ class CustomerManager:
             # check for recommendation if necessary:
             if self.customer_list[-1].need_recommendation:
                 recommended_cocktail = self.create_customer_recomendation()
-                #'http://www.chalmers.se/ontologies/ssy235Ontology.owl#hasTaste'
                 self.customer_list[-1].customer_drink = recommended_cocktail[53:]
 
             cocktail_queries = self.customer_list[-1].create_customer_drink_queries()
@@ -201,7 +206,10 @@ class CustomerManager:
                 if 'O' in solution:
                     ingredient_list.append(solution['O'][53:])
         self.query.finish()
-        print('Ingredients for the order are:')
+        print('Getting ready to prepare your order.')
+        print('The Ingredients for the order are:')
+        for ingredient in ingredient_list:
+            print(ingredient)
         return ingredient_list
         
 
@@ -212,7 +220,6 @@ class CustomerManager:
         customer_taste = self.customer_list[-1].return_customer_taste()
         customer_nationality = self.customer_list[-1].return_customer_nationality()
         customer_name = self.customer_list[-1].customer_name
-        # taste_query = taste_query = "rdf_has(I, 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#hasTaste', 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#"+ customer_taste+ "'), rdf_has(I, 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#hasTaste', 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#"+ customer_nationality+ "'), owl_individual_of(I, 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#BarCustomer')"        
         taste_query = "rdf_has(I, 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#hasTaste', 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#"+ customer_taste+ "'), owl_individual_of(I, 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#BarCustomer')"        
         # crate a list with strings of the customer names that have similar taste preferences
         similar_taste_group = []
@@ -225,7 +232,6 @@ class CustomerManager:
 
         # create a list with possible values
         cocktail_choices = {}
-        print('Now checking which cocktails are their preferences')
         for customer in similar_taste_group:
             ask_fac_cocktail_query = "rdf_has('" + customer + "', 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#likesDrink', O)"
             self.query = self.prolog.query(ask_fac_cocktail_query)
@@ -266,7 +272,6 @@ class CustomerManager:
         Method to ask all the queries in the query list object and return the answers
         """
         for query in query_list:
-            # print(query)
             self.ask_single_query(query)
 
 
@@ -308,16 +313,7 @@ class BarManager():
                         print(solution)
             self.query.finish()
         print('Bar loaded sucessfully')
-        """
-        self.query = self.prolog.query("owl_individual_of(O, 'http://www.chalmers.se/ontologies/ssy235Ontology.owl#BarCustomer')")
-        for solution in self.query.solutions():
-            if solution != {}:
-                if 'O' in solution:
-                    print(solution['O'])
-                else:
-                    print(solution)
-        self.query.finish()
-        """
+
 
 class PlanningManager():
 
@@ -362,10 +358,8 @@ class PlanningManager():
         
         if ingredient_msg:
             self.pub.publish(ingredient_msg)
-        # self.customer_manager
-        # test the new query
 
-        
+     
 if __name__ == '__main__':
     # Initialize the node and name it.
     rospy.init_node("PlanningManager")
@@ -376,124 +370,3 @@ if __name__ == '__main__':
 
     except rospy.ROSInterruptException:
         pass
-
-"""
-ask for a object type rdf:type
-ask for a object property: rdf_has(I, ssy235Ontology:'objectProperty', O)
-crate an instance of an object rdf_assert()
-
-rdf_has(O, ssy235Ontology:'hasTaste', Drink_1).
-rdf_has(O, ssy235Ontology:'hasTaste', ssy235Ontology:'Beer').
-rdf_has(ssy235Ontology:'FoodOrDrink', ssy235Ontology:'hasTaste', O).    a
-rdf_has(ssy235Ontology:'hasTaste', rdf:type, O).
-rdf_has(ssy235Ontology:'Beer',rdf:'resource', O).
-rdf_has(I,rdf:'resource', ssy235Ontology:'Beer').
-Create an instance of  the beer class
-
-rdf_assert(ssy235Ontology:'Drink_1', rdf:type, ssy235Ontology:'Beer').
-rdf_has(ssy235Ontology:'Drink_1', ssy235Ontology:'hasTaste', O).
-rdf_has(ssy235Ontology:'Beer', ssy235Ontology:'hasTaste', O).
-assert and object property
-
-rdf_assert(ssy235Ontology:'Drink_1', ssy235Ontology:'hasTaste', ssy235Ontology:'Bitter').
-
-rdf_has(ssy235Ontology:'BrittishPeople', ssy235Ontology:'likesDrink', O).
-
-rdf_assert(ssy235Ontology:'German_1', rdf:type, ssy235Ontology:'GermanPeople')
-
-<node name="rosprolog" pkg="rosprolog" type="rosprolog_node" output="screen"/>
-
-        query = self.prolog.query("member(A, [1, 2, 3, 4]), B = ['x', A]")
-        for solution in query.solutions():
-            print 'Found solution. A = %s, B = %s' % (solution['A'], solution['B'])
-        query.finish()
-    
-
-        self.query = self.prolog.query(self.customer_list[self.customer_count-1].customer_query)
-
-        for solution in self.query.solutions():
-            print(solution)
-        self.query.finish()
-
-        self.query = None
-
-        self.query = self.prolog.query( self.customer_list[self.customer_count-1].taste_query)
-
-        for solution in self.query.solutions():
-            print(solution)
-        self.query.finish()
-
-        self.query = self.prolog.query( "rdf_assert('http://www.chalmers.se/ontologies/"
-        "ssy235Ontology.owl#Drink_1', rdf:type, "
-        "'http://www.chalmers.se/ontologies/ssy235Ontology.owl#Beer')")
-        for solution in self.query.solutions():
-            print(solution)
-        self.query.finish()
-
-        self.query = self.prolog.query("owl_individual_of(I, "
-        "'http://www.chalmers.se/ontologies/ssy235Ontology.owl#Beer')")
-
-        for solution in self.query.solutions():
-            # print(solution)
-            print(solution['I'])
-        self.query.finish()
-
-
-                if cocktail_msg.favourite_taste == 1:
-            self.favourite_taste = 'Sweet'
-
-        elif cocktail_msg.favourite_taste == 2:
-            self.favourite_taste = 'Bitter'
-        
-        elif cocktail_msg.favourite_taste == 3:
-            self.favourite_taste = 'Spicy'
-
-        elif cocktail_msg.favourite_taste == 4:
-            self.favourite_taste = 'Sour'
-        
-        elif cocktail_msg.favourite_taste == 5:
-            self.favourite_taste = 'Salty'
-      
-
-        if cocktail_msg.customer_nationality == 1:
-            self.customer_name = 'Swedish_customer'+ str(self.number) 
-            self.nationality = 'Swedish'
-
-        elif cocktail_msg.customer_nationality == 2:
-            self.customer_name = 'German_customer'+ str(self.number) 
-            self.nationality = 'German'
-
-
-        elif cocktail_msg.customer_nationality == 3:
-            self.customer_name = 'Scottish_customer'+ str(self.number) 
-            self.nationality = 'Scottish'
-
-
-        elif cocktail_msg.customer_nationality == 4:
-            self.customer_name = 'Spanish_customer'+ str(self.number) 
-            self.nationality = 'Spanish'
-
-
-        elif cocktail_msg.customer_nationality == 5:
-            self.customer_name = 'Chinese_customer'+ str(self.number) 
-            self.nationality = 'Chinese'
-
-
-        elif cocktail_msg.customer_nationality == 6:
-            self.customer_name = 'Brittish_customer'+ str(self.number) 
-            self.nationality = 'Brittish'
-
-
-        elif cocktail_msg.customer_nationality == 7:
-            self.customer_name = 'Mexican_customer'+ str(self.number) 
-            self.nationality = 'Mexican'
-
-        elif cocktail_msg.customer_nationality == 8:
-            self.customer_name = 'American_customer'+ str(self.number) 
-            self.nationality = 'American'
-
-
-        elif cocktail_msg.customer_nationality == 9:
-            self.customer_name = 'customer'+ str(self.number) 
-            self.nationality = 'Else'
-"""
