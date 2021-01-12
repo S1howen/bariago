@@ -24,7 +24,7 @@ roslaunch bariago bariago.launch
 ```
 3. Listen to the text in the terminal and create a order and your cocktail will be served in no time!:)
 
-4. If you want to start a new order type in the second terminal:
+4. If you want to start a new order type in the third terminal:
 ```
 x
 NewOrder
