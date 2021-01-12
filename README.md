@@ -7,7 +7,7 @@ Bariago the following commands must be entered:
 ```
 cd catkin_ws/
 source devel/setup.bash
-roslaunch knowrob_tutorial.launch
+roslaunch knowrob_tutorial onto_robot.launch
 ```
 
 2. Open a second terminal
